@@ -84,4 +84,6 @@ Finally, open [http://localhost:5173](http://localhost:5173) in your browser to 
 - `data/` & `results/`: Processed datasets, CSV exports, and visualization outputs like confusion matrices and forecasting plots.
 
 ## License
-MIT License
+© 2026 Bharath V. All Rights Reserved.
+
+This project and its source code are private and may not be copied, distributed, modified, or used without explicit permission from the author.
