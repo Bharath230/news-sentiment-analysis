@@ -20,9 +20,7 @@ env/
 node_modules/
 frontend/dist/
 
-# ===== Large Model Files =====
-models/sentiment_model/model.safetensors
-models/sentiment_model/tokenizer.json
+# Large model files are now handled by Git LFS
 
 # ===== Training Checkpoints =====
 results/checkpoint-*/
@@ -36,6 +34,8 @@ results/checkpoint-*/
 
 # ===== Data Backups =====
 *.bak_*
+*.bak
+* - Copy.csv
 
 # ===== OS Files =====
 Thumbs.db

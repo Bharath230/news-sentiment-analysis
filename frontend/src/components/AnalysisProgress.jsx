@@ -30,61 +30,69 @@ const AnalysisProgress = ({ status }) => {
     const isDone = state === 'done'
     const isError = state === 'error'
 
-    // Pick icon based on progress phase
     let icon = stageIcons.fetching
     if (progress > 35) icon = stageIcons.processing
     if (isDone) icon = stageIcons.done
     if (isError) icon = stageIcons.error
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center animate-in fade-in duration-300">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md" />
 
             {/* Card */}
-            <div className="relative w-full max-w-md mx-4 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 space-y-6">
+            <div className="relative w-full max-w-md mx-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700/60 rounded-3xl shadow-2xl p-8 space-y-6 overflow-hidden">
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary-500/20 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl"></div>
+
                 {/* Pulsing Icon */}
-                <div className="flex justify-center">
+                <div className="flex justify-center relative z-10">
                     <div
-                        className={`p-4 rounded-full ${isDone
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : isError
-                                    ? 'bg-red-500/20 text-red-400'
-                                    : 'bg-blue-500/20 text-blue-400 animate-pulse'
+                        className={`p-4 rounded-2xl shadow-inner ${isDone
+                            ? 'bg-primary-100 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-500/20'
+                            : isError
+                                ? 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20'
+                                : 'bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 animate-pulse'
                             }`}
                     >
                         {icon}
                     </div>
                 </div>
 
-                {/* Title */}
-                <h2 className="text-center text-xl font-semibold text-slate-100">
-                    {isDone ? 'Analysis Complete' : isError ? 'Analysis Failed' : 'Running Analysis...'}
-                </h2>
-
-                {/* Status Message */}
-                <p className="text-center text-slate-400 text-sm min-h-[20px]">
-                    {message || 'Initializing...'}
-                </p>
+                <div className="relative z-10">
+                    <h2 className="text-center text-xl font-bold text-gray-900 dark:text-white tracking-tight mb-1">
+                        {isDone ? 'Analysis Complete' : isError ? 'Analysis Failed' : 'Running Analysis...'}
+                    </h2>
+                    <p className="text-center text-gray-500 dark:text-slate-400 text-sm min-h-[20px] font-medium">
+                        {message || 'Initializing...'}
+                    </p>
+                </div>
 
                 {/* Progress Bar */}
-                <div className="space-y-2">
-                    <div className="w-full h-2.5 bg-slate-700 rounded-full overflow-hidden">
+                <div className="space-y-2 relative z-10 pt-2">
+                    <div className="w-full h-3 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden ring-1 ring-gray-200 dark:ring-slate-700/50 shadow-inner">
                         <div
-                            className={`h-full rounded-full transition-all duration-500 ease-out ${isDone
-                                    ? 'bg-emerald-500'
-                                    : isError
-                                        ? 'bg-red-500'
-                                        : 'bg-gradient-to-r from-blue-500 to-indigo-500'
+                            className={`h-full rounded-full transition-all duration-500 ease-out relative overflow-hidden ${isDone
+                                ? 'bg-primary-500'
+                                : isError
+                                    ? 'bg-red-500'
+                                    : 'bg-gradient-to-r from-blue-500 via-indigo-500 to-primary-500'
                                 }`}
                             style={{ width: `${progress}%` }}
-                        />
+                        >
+                            {!isDone && !isError && (
+                                <div className="absolute inset-0 bg-white/20 w-full animate-shimmer"></div>
+                            )}
+                        </div>
                     </div>
-                    <p className="text-right text-xs text-slate-500 font-mono">{progress}%</p>
+                    <div className="flex justify-between items-center text-xs font-mono font-medium">
+                        <span className={isError ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-slate-500'}>{isError ? 'Error occurred' : 'Processing...'}</span>
+                        <span className={isDone ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-slate-400'}>{progress}%</span>
+                    </div>
                 </div>
 
                 {/* Stage Pills */}
-                <div className="flex justify-center gap-2 flex-wrap">
+                <div className="flex justify-center gap-2 flex-wrap relative z-10 pt-4 border-t border-gray-200 dark:border-slate-800/60 mt-4">
                     {['Fetch', 'Dedup', 'Sentiment', 'Tagging'].map((stage, i) => {
                         const thresholds = [5, 25, 35, 40]
                         const active = progress >= thresholds[i]
@@ -92,14 +100,19 @@ const AnalysisProgress = ({ status }) => {
                         return (
                             <span
                                 key={stage}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${current
-                                        ? 'bg-blue-500/30 text-blue-300 ring-1 ring-blue-500/50'
-                                        : active
-                                            ? 'bg-slate-600/50 text-slate-300'
-                                            : 'bg-slate-700/50 text-slate-500'
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-1.5 ${current
+                                    ? 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-200 dark:ring-indigo-500/30'
+                                    : active
+                                        ? 'bg-primary-100 dark:bg-primary-500/10 text-primary-700 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-500/20'
+                                        : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 border border-gray-200 dark:border-slate-700'
                                     }`}
                             >
-                                {active && !current ? '✓ ' : ''}{stage}
+                                {active && !current ? (
+                                    <svg className="w-3 h-3 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                ) : current ? (
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 animate-pulse"></div>
+                                ) : null}
+                                {stage}
                             </span>
                         )
                     })}

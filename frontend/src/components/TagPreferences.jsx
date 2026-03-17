@@ -60,20 +60,19 @@ const TagPreferences = ({ onPreferencesChange }) => {
   const hasChanges = JSON.stringify(selectedTags.slice().sort()) !== JSON.stringify(savedTags.slice().sort())
 
   return (
-    <div className="bg-slate-800 rounded-2xl shadow-lg border border-slate-700 overflow-hidden">
-      {/* Collapsible Header */}
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm dark:shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 hover:bg-slate-750 transition-colors"
+        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-slate-750 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400">
-            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
-            <path d="M7 7h.01"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-500 dark:text-violet-400">
+            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
+            <path d="M7 7h.01" />
           </svg>
-          <span className="text-sm font-semibold text-slate-200">Tag Preferences</span>
+          <span className="text-sm font-semibold text-gray-800 dark:text-slate-200">Tag Preferences</span>
           {savedTags.length > 0 && (
-            <span className="text-[10px] bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full font-medium">
+            <span className="text-[10px] bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 px-2 py-0.5 rounded-full font-medium">
               {savedTags.length} active
             </span>
           )}
@@ -81,21 +80,20 @@ const TagPreferences = ({ onPreferencesChange }) => {
         <svg
           xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-gray-400 dark:text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         >
-          <polyline points="6 9 12 15 18 9"/>
+          <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
 
-      {/* Collapsible Content */}
       <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
         <div className="px-4 pb-4 space-y-3">
-          <p className="text-[11px] text-slate-500 leading-relaxed">
+          <p className="text-[11px] text-gray-400 dark:text-slate-500 leading-relaxed">
             Select tags to prioritize matching news in your feed.
           </p>
 
           {allTags.length === 0 ? (
-            <div className="text-center py-4 text-slate-500 text-xs">
+            <div className="text-center py-4 text-gray-400 dark:text-slate-500 text-xs">
               No tags available yet. Run analysis first.
             </div>
           ) : (
@@ -108,8 +106,8 @@ const TagPreferences = ({ onPreferencesChange }) => {
                     onClick={() => toggleTag(tag)}
                     className={`text-[11px] px-2.5 py-1 rounded-full border transition-all duration-150 font-medium
                       ${isSelected
-                        ? 'bg-violet-500/20 text-violet-300 border-violet-500/40 shadow-sm shadow-violet-500/10'
-                        : 'bg-slate-700/50 text-slate-400 border-slate-600/50 hover:bg-slate-700 hover:text-slate-300'
+                        ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border-violet-300 dark:border-violet-500/40 shadow-sm'
+                        : 'bg-gray-100 dark:bg-slate-700/50 text-gray-500 dark:text-slate-400 border-gray-200 dark:border-slate-600/50 hover:bg-gray-200 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-slate-300'
                       }`}
                   >
                     {isSelected && <span className="mr-0.5">✓ </span>}
@@ -120,7 +118,6 @@ const TagPreferences = ({ onPreferencesChange }) => {
             </div>
           )}
 
-          {/* Save Button */}
           {hasChanges && (
             <button
               onClick={savePreferences}
