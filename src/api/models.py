@@ -14,6 +14,7 @@ class NewsArticle(SQLModel, table=True):
     prob_pos: float
     keyword_count: int
     tags: Optional[str] = Field(default="")  # Comma-separated tags
+    affected_countries: Optional[str] = Field(default="")  # Comma-separated country names
     timestamp: datetime = Field(default_factory=datetime.now)
 
 class RiskForecast(SQLModel, table=True):
@@ -24,3 +25,10 @@ class RiskForecast(SQLModel, table=True):
 class UserTagPreference(SQLModel, table=True):
     user_id: str = Field(primary_key=True)  # Clerk user sub
     preferred_tags: str = Field(default="")  # Comma-separated preferred tags
+
+class UserProfile(SQLModel, table=True):
+    user_id: str = Field(primary_key=True)  # Clerk user sub
+    name: str = Field(default="")
+    company_name: str = Field(default="")
+    sc_component: str = Field(default="")
+    business_details: str = Field(default="")

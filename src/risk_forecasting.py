@@ -13,6 +13,7 @@ warnings.filterwarnings("ignore", module="statsmodels")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_PATH = os.path.join(BASE_DIR, "results", "realtime_predictions.csv")
 OUTPUT_PATH = os.path.join(BASE_DIR, "results", "risk_forecast.csv")
+RESAMPLED_PATH = os.path.join(BASE_DIR, "results", "resampled_timeseries.csv")
 PLOT_RISK_SCORE_PATH = os.path.join(BASE_DIR, "results", "forecast_risk_score.png")
 PLOT_SENTIMENT_PATH = os.path.join(BASE_DIR, "results", "forecast_sentiment.png")
 PLOT_VOLUME_PATH = os.path.join(BASE_DIR, "results", "forecast_volume.png")
@@ -87,8 +88,10 @@ def run_forecasting():
         print(f"Loaded {len(df)} data points with advanced features.")
         print(f"Avg Negative Prob: {df['Prob_Neg'].mean():.3f}")
 
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="mixed", errors="coerce")
+    df = df.dropna(subset=["Timestamp"])
     df.set_index("Timestamp", inplace=True)
+    df.sort_index(inplace=True)
 
     # ---------------- AGGREGATE FEATURES ----------------
     resampled = df.resample("10min").agg({
@@ -100,6 +103,12 @@ def run_forecasting():
 
     risk_ts = resampled["Risk_Score"]
     print(f"Time series length after resampling: {len(risk_ts)}")
+
+    # Save resampled data for frontend live charts
+    resampled_export = resampled.copy()
+    resampled_export.index.name = "Timestamp"
+    resampled_export.to_csv(RESAMPLED_PATH)
+    print(f"Resampled timeseries saved to: {RESAMPLED_PATH}")
 
     # ---------------- MODEL ----------------
     if len(risk_ts) < MIN_DATA_POINTS:
@@ -155,15 +164,27 @@ def run_forecasting():
     plt.close(fig2)
     print("Sentiment intensity plot saved to:", PLOT_SENTIMENT_PATH)
 
-    # Plot 3: Volume & Keywords
+    # Plot 3: Volume & Keywords (dual Y-axis)
     fig3, ax3 = plt.subplots(figsize=(10, 4))
     fig3.patch.set_facecolor(_FIG_COLOR)
     _style_ax(ax3)
     ax3.bar(resampled.index, resampled["Article_Count"], label="Total Articles", alpha=0.3, width=0.004, color='#818cf8')
-    ax3.plot(resampled.index, resampled["Keyword_Count"], label="Supply Chain Keywords", color='#34d399', marker='^')
-    ax3.set_ylabel("Count")
-    ax3.set_title("News Volume & Keyword Buzz")
-    ax3.legend(facecolor=_BG_COLOR, edgecolor=_GRID_COLOR, labelcolor=_TEXT_COLOR)
+    ax3.set_ylabel("Article Count", color='#818cf8')
+    ax3.tick_params(axis='y', labelcolor='#818cf8')
+
+    # Secondary Y-axis for keyword count
+    ax3b = ax3.twinx()
+    ax3b.plot(resampled.index, resampled["Keyword_Count"], label="Supply Chain Keywords", color='#34d399', marker='^')
+    ax3b.set_ylabel("Keyword Count", color='#34d399')
+    ax3b.tick_params(axis='y', labelcolor='#34d399')
+    for spine in ax3b.spines.values():
+        spine.set_color(_GRID_COLOR)
+
+    ax3.set_title("News Volume & Keyword Buzz", color=_TEXT_COLOR)
+    # Combine legends from both axes
+    lines1, labels1 = ax3.get_legend_handles_labels()
+    lines2, labels2 = ax3b.get_legend_handles_labels()
+    ax3.legend(lines1 + lines2, labels1 + labels2, facecolor=_BG_COLOR, edgecolor=_GRID_COLOR, labelcolor=_TEXT_COLOR)
     _format_xaxis(ax3, list(resampled.index))
     fig3.tight_layout()
     fig3.savefig(PLOT_VOLUME_PATH, facecolor=fig3.get_facecolor(), edgecolor='none')
